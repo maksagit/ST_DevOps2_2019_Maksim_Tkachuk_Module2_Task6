@@ -55,11 +55,16 @@ Invoke-Command -ComputerName $hosts -Credential "S2012R2\Administrator" -ScriptB
 
 ### 1.4. Расшарить папку на компьютере
 
-net share GitShare=D:\git /users:13 /remark:"Git share!"
+(Get-WmiObject -List -ComputerName . | `
+Where-Object -FilterScript {$_.Name –eq "Win32_Share"}).InvokeMethod("Create",("D:\git","GitShare",0,13,"My Git share!"))
+
+# net share GitShare=D:\git /users:13 /remark:"My Git share!"
 
 ### 1.5. Удалить шару из п.1.4
 
-net share GitShare /delete
+(Get-WmiObject -Class Win32_Share -ComputerName . -Filter "Name='GitShare'").InvokeMethod("Delete",$null)
+
+# net share GitShare /delete
 
 ### 2.1. Получить список коммандлетов работы с Hyper-V (Module Hyper-V)
 
